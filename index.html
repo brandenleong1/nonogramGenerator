@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Nonogram</title>
+
+		<link href="style.css" rel="stylesheet" type="text/css" />
+		<style id="loading-css">
+			body *:not(#loading) {
+				opacity: 0;
+			}
+		</style>
+		<!-- <link href="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/horizontal_layout.css" rel="stylesheet" type="text/css" /> -->
+		<link href="../utils/themes/horizontal_layout.css" rel="stylesheet" type="text/css" />
+		<link href="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/colors.css" rel="stylesheet" type="text/css" />
+	</head>
+
+	<body>
+		<div class="content-container-vertical vertical-section">
+			<div class="content-header">Nonogram Generator</div>
+			<div class="content-container-vertical">
+				<div class="content-container-vertical">
+					<div class="content-container-horizontal">
+						<label for="input-image" class="button-positive-2">Select a file:</label>
+						<input type="file" id="input-image" accept=".png, .jpg, .jpeg">
+						<div class="content-container-vertical"><span id="file-label">No file selected.</span></div>
+					</div>
+				</div>
+
+				<div class="content-container-vertical" style="justify-content: center;">
+					<div class="content-header-2">Preview:</div>
+					<canvas id="canvas" style="background-color: #ffffff; width: 0; height: 0;"></canvas>
+					<div class="content-caption" id="img-size-caption"></div>
+				</div>
+
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div>Select background color <br> (for alpha channel):</div>
+					<input type="color" id="background-color-select" value="#ffffff"/>
+				</div>
+			</div>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="kernel-editor-section" style="width: 340px; pointer-events: none;">
+			<div class="content-header-2">Kernel Editor</div>
+			<div class="content-container-vertical" style="row-gap: 10px; justify-content: flex-start;">
+				<div class="content-container-vertical" id="kernel-list"></div>
+				<div class="content-container-horizontal" style="column-gap: 20px;">
+					<div class="button-positive-2" onclick="addKernel();">Add Kernel</div>
+					<div class="button-positive-2" onclick="convolveSelected();">Convolve →</div>
+				</div>
+				<div class="content-break-vertical"></div>
+				<div class="content-container-horizontal">
+					<div id="kernel-editor" style="display: grid;"></div>
+					<div class="content-container-vertical" id="predefined-kernel-list" style="display: none;">
+						<div class="content-container-horizontal">
+							<div>Identity</div>
+							<div class="button-positive-2" onclick="selectKernel('identity');">Select</div>
+						</div>
+						<div class="content-container-horizontal">
+							<div>Edge Detection (edges) (≥3x3)</div>
+							<div class="button-positive-2" onclick="selectKernel('edgeDetect4');">Select</div>
+						</div>
+						<div class="content-container-horizontal">
+							<div>Edge Detection (edges + corners) (≥3x3)</div>
+							<div class="button-positive-2" onclick="selectKernel('edgeDetect8');">Select</div>
+						</div>
+						<div class="content-container-horizontal">
+							<div>Sharpen (≥3x3)</div>
+							<div class="button-positive-2" onclick="selectKernel('sharpen');">Select</div>
+						</div>
+						<div class="content-container-horizontal">
+							<div>Box Blur</div>
+							<div class="button-positive-2" onclick="selectKernel('boxBlur');">Select</div>
+						</div>
+						<div class="content-container-horizontal">
+							<div>Gaussian Blur</div>
+							<div class="button-positive-2" onclick="selectKernel('gaussianBlur');">Select</div>
+						</div>
+					</div>
+				</div>
+				<div class="content-container-horizontal" style="column-gap: 20px;">
+					<div class="button-positive-2" onclick="showKernelEditor();">Custom Kernel</div>
+					<div class="button-positive-2" onclick="showKernelList();">Kernel List</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="kernel-settings-section" style="width: 260px; pointer-events: none;">
+			<div class="content-header-2">Kernel Settings</div>
+			<div class="content-container-vertical" style="width: 100%; row-gap: 10px; justify-content: flex-start; align-items: flex-start;">
+				<div class="content-container-horizontal" style="align-items: center; column-gap: 15px; align-self: center;">
+					<div>Size: <span id="kernel-size">0</span></div>
+					<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateKernelSize(2);">+</div>
+					<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateKernelSize(-2);">-</div>
+				</div>
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div class="checkbox" id="normalize-checkbox"></div>
+					<div title="Makes entries sum to 1" style="cursor: help;">Normalize kernel?</div>
+				</div>
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div>Edge handling:</div>
+					<select class="button-positive-2" id="edge-handling" style="padding: 5px; background-color: rgba(0, 0, 0, 0); border: none;">
+						<option value="extend">Extend</option>
+						<option value="wrap">Wrap</option>
+						<option value="mirror">Mirror</option>
+						<option value="crop">Crop</option>
+						<option value="constant">Constant</option>
+					</select>
+				</div>
+				<div class="content-container-horizontal" id="constant-color-select" style="align-items: center; display: none;">
+					<div>Select constant:</div>
+					<input type="color" />
+				</div>
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div>Negative values:</div>
+					<select class="button-positive-2" id="negative-handling" style="padding: 5px; background-color: rgba(0, 0, 0, 0); border: none;">
+						<option value="clip">Clip</option>
+						<option value="magnitude">Magnitude</option>
+					</select>
+				</div>
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div class="checkbox" id="fft-checkbox"></div>
+					<div>Use FFT?</div>
+				</div>
+				<div class="content-container-horizontal" style="align-items: center;">
+					<div class="checkbox" id="grayscale-output-checkbox"></div>
+					<div>B/W output?</div>
+				</div>
+			</div>
+			<div class="content-header-2">Kernel Info</div>
+			<div class="content-container-vertical" style="width: 100%; row-gap: 10px; justify-content: flex-start; align-items: flex-start;">
+				<div>Kernel Sum: <span id="kernel-sum">0</span></div>
+				<div>Max Element: <span id="kernel-max">0</span></div>
+				<div>Min Element: <span id="kernel-min">0</span></div>
+			</div>
+			<div class="content-container-vertical">
+				<div class="content-header-2">Kernel Preview</div>
+				<canvas id="kernel-visualizer" style="width: 200px; height: 200px; image-rendering: pixelated;"></canvas>
+			</div>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="convolution-section" style="width: 340px;">
+			<div class="content-header-2">Convolution Console</div>
+			<div class="content-container-vertical console" id="convolution-console"></div>
+			<canvas id="canvas-2"></canvas>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="nonogram-settings-section" style="width: 260px; pointer-events: none;">
+			<div class="content-header-2">Nonogram Settings</div>
+			<div class="content-container-vertical" style="width: 100%; row-gap: 10px; justify-content: flex-start; align-items: flex-start;">
+				<div class="content-container-horizontal" style="width: 100%; justify-content: space-between; align-items: center; column-gap: 15px; align-self: center;">
+					<div>Width: <span id="nonogram-width">1</span></div>
+					<div class="content-container-horizontal" style="align-items: center; column-gap: 15px; align-self: center;">
+						<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNonogramSize(event, 1, 1);">+</div>
+						<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNonogramSize(event, -1, 1);">-</div>
+					</div>
+				</div>
+				<div class="content-container-horizontal" style="width: 100%; justify-content: space-between; align-items: center; column-gap: 15px; align-self: center;">
+					<div>Height: <span id="nonogram-height">1</span></div>
+					<div class="content-container-horizontal" style="align-items: center; column-gap: 15px; align-self: center;">
+						<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNonogramSize(event, 1, 0);">+</div>
+						<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNonogramSize(event, -1, 0);">-</div>
+					</div>
+				</div>
+				<div class="content-caption">(Shift: ±5, Ctrl: ±10)</div>
+				<div class="button-positive-2" style="align-self: center;" onclick="downsample();">Downsample</div>
+				<div class="content-break-vertical" style="height: 16px;"></div>
+				<canvas id="canvas-3" style="align-self: center; image-rendering: pixelated; width: 0;"></canvas>
+				<div class="content-caption" id="color-caption"></div>
+			</div>
+			<div class="content-break-vertical"></div>
+			<div class="content-container-vertical" id="colorizer-container" style="pointer-events: none;">
+				<div class="content-container-vertical" style="width: 100%; row-gap: 10px; justify-content: flex-start; align-items: flex-start;">
+					<div class="content-container-horizontal" id="nonogram-colors-container" style="width: 100%; justify-content: space-between; align-items: center; column-gap: 15px; align-self: center;">
+						<div>Colors: <span id="nonogram-colors">1</span></div>
+						<div class="content-container-horizontal" style="align-items: center; column-gap: 15px; align-self: center;">
+							<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNumColors(event, 1);">+</div>
+							<div class="button-positive-2" style="padding: 8px; line-height: 10px; width: 10px; text-align: center;" onclick="updateNumColors(event, -1);">-</div>
+						</div>
+					</div>
+					<div class="content-container-horizontal" id="quantization-container" style="align-items: center;">
+						<div>Quantization <br> algorithm:</div>
+						<select class="button-positive-2" id="quantization" style="padding: 5px; background-color: rgba(0, 0, 0, 0); border: none;">
+							<option value="median-cut">Median Cut</option>
+							<option value="k-means">K-Means Clustering</option>
+						</select>
+					</div>
+					<div class="content-container-horizontal" style="align-items: center;">
+						<div class="checkbox" id="blackwhite-checkbox"></div>
+						<div>Black and White?</div>
+					</div>
+					<div class="content-container-horizontal" id="grayscale-container" style="align-items: center; column-gap: 15px; pointer-events: none;">
+						<div>Cutoff (B-W):</div>
+						<input type="range" id="grayscale-cutoff" min="0" max="100" value="50" />
+						<div id="grayscale-cutoff-label" style="width: 4em;">50%</div>
+					</div>
+					<div class="content-container-horizontal" style="align-items: center; pointer-events: none;">
+						<div class="checkbox" id="invert-checkbox"></div>
+						<div>Invert</div>
+					</div>
+				</div>
+				<div class="content-container-horizontal">
+					<div class="button-positive-2" onclick="generateNonogram();">Generate</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="nonogram-section" style="width: 340px;">
+			<div class="content-header-2">Nonogram Console</div>
+			<div class="content-container-vertical console" id="nonogram-console"></div>
+		</div>
+
+		<div class="content-container-vertical">
+			<canvas id="canvas-4" style="image-rendering: pixelated; height: 80%; width: auto; align-self: center;"></canvas>
+			<div class="content-caption">Click on color to mark it as background<span id="background-color-span"></span>.<br>Hover over color to get hex/rgb code.</div>
+			<div class="content-container-horizontal" style="align-items: center;">
+				<div>Gridlines (x5)?</div>
+				<div class="checkbox" id="gridline-checkbox"></div>
+				<div class="content-container-horizontal" style="align-items: center; display: none;">
+					Select: <input type="color" id="gridline-color-select" value="#ff0000"/>
+				</div>
+				<div class="button-positive-2" onclick="drawCanvas4();">Redraw</div>
+			</div>
+		</div>
+
+		<div class="content-container-vertical vertical-section" id="colors-list"></div>
+
+		<div id="bottom-bar">
+			<img id="help" src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/icons/help.svg" />
+			<img id="settings" src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/icons/settings.svg" />
+		</div>
+
+		<div class="popup" id="popup-help">
+			<div class="content-header">Help</div>
+			<div class="content-container-vertical">
+				<div class="content-text">Text styled like <span style="color: var(--color_btn);">this</span> are buttons.</div>
+				<div class="content-text">This website helps generate a nonogram from an input image. The process is divided into three stages:
+					<ol>
+						<li>Convolution - Create and edit kernels to convolve with the image. Kernels are convolved in the order they appear in the list, top to bototm.</li>
+						<li>Downsampling - Select how many pixels the output image should be.</li>
+						<li>Color Quantization - Select what kind of nonogram (black/white or color) and how many colors should be in the palatte.</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="popup" id="popup-settings">
+			<div class="content-header">Settings</div>
+			<div class="content-text" style="overflow-y: hidden;">
+				<span class="button-positive" id="theme-btn">Change Theme:</span>
+				<span style="position: relative; display: inline-flex; width: 85px;"> &nbsp;
+					<span id="theme-label-1" style="position: absolute; max-width: 80px; overflow-x: hidden; text-overflow: ellipsis;"></span>
+					<span id="theme-label-2" style="max-width: 80px; overflow-x: hidden; text-overflow: ellipsis;"></span>
+				</span>
+			</div>
+		</div>
+
+		<div id="loading"></div>
+
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/math.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/random.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/rate_funcs.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/utils.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/colors.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/animate.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/cookies.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/math_jax.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/math_jax_config.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/base64.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/utils/themes.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/popup.js"></script>
+
+		<script src="script.js"></script>
+		<script src="init.js"></script>
+		<script src="kernel.js"></script>
+		<script src="convolve.js"></script>
+		<script src="nonogram.js"></script>
+	</body>
+</html>
