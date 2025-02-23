@@ -20,13 +20,13 @@ function printToConsole(consoleDiv, string, indents = 0, id = null) {
 			let indent = document.createElement('div');
 			indent.classList.add('indent');
 			if (i == indents - 1) indent.innerText = '⤷';
-			container.appendChild(indent);
+			container.append(indent);
 		}
 
 		let div = document.createElement('div');
 		div.innerText = string;
-		container.appendChild(div);
-		consoleDiv.appendChild(container);
+		container.append(div);
+		consoleDiv.append(container);
 		setTimeout(resolve, 0);
 	});
 }

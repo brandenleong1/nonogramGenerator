@@ -14,7 +14,7 @@ async function init() {
 	link.href = 'https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/transition.css';
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
-	document.head.appendChild(link);
+	document.head.append(link);
 
 	let font = new FontFace('Proxima Nova', 'url(https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/proximanova.ttf)');
 	await font.load();

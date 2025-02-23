@@ -204,7 +204,7 @@ async function generateNonogram() {
 			drawCanvas4();
 		};
 
-		colorsList.appendChild(div);
+		colorsList.append(div);
 	}
 
 	let endTime = performance.now();

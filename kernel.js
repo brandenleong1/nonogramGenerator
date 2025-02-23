@@ -45,11 +45,8 @@ function addKernel() {
 		else editKernel(div);
 	};
 
-	div.appendChild(checkbox);
-	div.appendChild(name);
-	div.appendChild(editBtn);
-	div.appendChild(removeBtn);
-	list.appendChild(div);
+	div.append(checkbox, name, editBtn, removeBtn);
+	list.append(div);
 
 	list.scrollTop = list.scrollHeight;
 
@@ -161,8 +158,8 @@ function editKernel(kernel) {
 					updateKernelSettingsInfo();
 				};
 
-				div.appendChild(inner);
-				editor.appendChild(div);
+				div.append(inner);
+				editor.append(div);
 			}
 		}
 
@@ -179,8 +176,8 @@ function editKernel(kernel) {
 			div_r.style.gridRow = i + 1;
 			div_r.style.gridColumn = kernel.kernel.length;
 
-			editor.appendChild(div_c);
-			if (i != kernel.kernel.length) editor.appendChild(div_r);
+			editor.append(div_c);
+			if (i != kernel.kernel.length) editor.append(div_r);
 		}
 
 		kernel.classList.add('selected');
