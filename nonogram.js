@@ -448,6 +448,8 @@ async function drawCanvas4() {
 	for (let i = 0; i < data3.length; i += 4) {
 		let colorIdx = imageColorsMap[[data3[i], data3[i + 1], data3[i + 2]]];
 
+		if (colorIdx === undefined) continue;
+
 		if (!isBackgroundColor[colorIdx]) {
 			let color = colorsArr[colorIdx];
 
