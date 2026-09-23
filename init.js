@@ -11,12 +11,12 @@ async function init() {
 	await Animate.remove(document.querySelector('#invert-checkbox').parentNode);
 
 	let link = document.createElement('link');
-	link.href = 'https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/transition.css';
+	link.href = 'lib/utils/themes/transition.css';
 	link.rel = 'stylesheet';
 	link.type = 'text/css';
 	document.head.append(link);
 
-	let font = new FontFace('Proxima Nova', 'url(https://cdn.jsdelivr.net/gh/brandenleong1/utils@latest/themes/proximanova.ttf)');
+	let font = new FontFace('Proxima Nova', 'url(lib/utils/themes/proximanova.ttf)');
 	await font.load();
 	document.fonts.add(font);
 
