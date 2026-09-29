@@ -43,7 +43,7 @@ async function convolveSelected() {
 	canvas2.width = canvas.width;
 
 	if (document.querySelector('#convolution-section').style.opacity == '0') {
-		await Animate.animate(document.querySelector('#convolution-section'), {anim: Animate.fadeIn , shiftFrom: UP, runTime: 200, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
+		await Animate.animate(document.querySelector('#convolution-section'), {anim: Animate.fadeIn , shiftFrom: UP, runTime: 800, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
 	}
 
 	let funcStartTime = performance.now();
@@ -157,10 +157,10 @@ async function convolveSelected() {
 	if (document.querySelector('#nonogram-settings-section').style.opacity == '0') {
 		document.querySelector('#nonogram-settings-section').style.pointerEvents = null;
 		await Animate.animateGroup([
-			[document.querySelector('#nonogram-settings-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 200, rateFunc: RateFuncs.easeOutCubic}],
-			[document.querySelector('#nonogram-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 200, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic}]
+			[document.querySelector('#nonogram-settings-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 800, rateFunc: RateFuncs.easeOutCubic}],
+			[document.querySelector('#nonogram-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 800, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic}]
 		]);
-		// await Animate.animate(document.querySelector('#nonogram-settings-section'), {anim: Animate.fadeIn , shiftFrom: UP, runTime: 200, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
+		// await Animate.animate(document.querySelector('#nonogram-settings-section'), {anim: Animate.fadeIn , shiftFrom: UP, runTime: 800, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
 	}
 
 	resetNonogramSettings();

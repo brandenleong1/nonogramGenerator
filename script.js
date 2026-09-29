@@ -36,8 +36,8 @@ function loadImage() {
 
 					await Utils.sleep(200);
 					await Animate.animateGroup([
-						[document.querySelector('#kernel-editor-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 200, rateFunc: RateFuncs.easeOutCubic}],
-						[document.querySelector('#kernel-settings-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 200, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic}]
+						[document.querySelector('#kernel-editor-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 800, rateFunc: RateFuncs.easeOutCubic}],
+						[document.querySelector('#kernel-settings-section'), Animate.fadeIn, {shiftFrom: UP, runTime: 800, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic}]
 					]);
 				}
 			};

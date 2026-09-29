@@ -127,7 +127,7 @@ async function downsample() {
 
 	if (document.querySelector('#colorizer-container').style.opacity == '0') {
 		document.querySelector('#colorizer-container').style.pointerEvents = null;
-		await Animate.animate(document.querySelector('#colorizer-container'), {anim: Animate.fadeIn , shiftFrom: DOWN, runTime: 200, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
+		await Animate.animate(document.querySelector('#colorizer-container'), {anim: Animate.fadeIn , shiftFrom: DOWN, runTime: 800, runTimeOffset: 200, rateFunc: RateFuncs.easeOutCubic});
 	}
 }
 
